@@ -8,6 +8,8 @@ import {
   Text,
   TouchableOpacity,
   TextInput,
+  Modal,
+  ScrollView,
 } from 'react-native';
 import { fetchJobs } from '../services/api';
 import { saveBookmark, removeBookmark, isJobBookmarked } from '../database/database';
@@ -24,6 +26,12 @@ const JobsScreen = ({ navigation }) => {
   const [bookmarkedJobs, setBookmarkedJobs] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
   const [filterData, setFilterData] = useState([]);
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [filters, setFilters] = useState({
+    experience: '',
+    jobType: '',
+    salaryRange: '',
+  });
 
   const loadJobs = async (pageNum = 1, shouldRefresh = false) => {
     if (loading || (!hasMore && !shouldRefresh)) return;
@@ -156,13 +164,12 @@ const JobsScreen = ({ navigation }) => {
 
   const handleSearch = (query) => {
     setSearchQuery(query);
-    
-    if (!query || query.trim() === '') {
-      setFilterData(jobs);
-    } else {
+    let filtered = [...jobs];
+
+    // Apply search filter
+    if (query && query.trim() !== '') {
       const searchText = query.toLowerCase().trim();
-      
-      const filtered = jobs.filter(job => {
+      filtered = filtered.filter(job => {
         const searchableFields = [
           job.title,
           job.company,
@@ -178,10 +185,264 @@ const JobsScreen = ({ navigation }) => {
           field.toLowerCase().includes(searchText)
         );
       });
-      
-      setFilterData(filtered);
     }
+
+    // Apply existing filters
+    if (filters.experience) {
+      filtered = filtered.filter(job => {
+        const jobExperience = job.experience?.toLowerCase() || '';
+        const filterExperience = filters.experience.toLowerCase();
+        
+        // Handle different experience level formats
+        if (filterExperience === 'entry level') {
+          return jobExperience.includes('entry') || 
+                 jobExperience.includes('fresher') || 
+                 jobExperience.includes('0-1') ||
+                 jobExperience.includes('0 to 1');
+        } else if (filterExperience === 'mid level') {
+          return jobExperience.includes('mid') || 
+                 jobExperience.includes('2-5') ||
+                 jobExperience.includes('2 to 5');
+        } else if (filterExperience === 'senior level') {
+          return jobExperience.includes('senior') || 
+                 jobExperience.includes('5+') ||
+                 jobExperience.includes('5+ years');
+        }
+        return false;
+      });
+    }
+
+    if (filters.jobType) {
+      filtered = filtered.filter(job => {
+        const jobType = job.jobType?.toLowerCase() || '';
+        const filterType = filters.jobType.toLowerCase();
+        
+        // Handle different job type formats
+        if (filterType === 'full time') {
+          return jobType.includes('full') || jobType.includes('permanent');
+        } else if (filterType === 'part time') {
+          return jobType.includes('part');
+        } else if (filterType === 'contract') {
+          return jobType.includes('contract') || jobType.includes('temporary');
+        } else if (filterType === 'internship') {
+          return jobType.includes('intern') || jobType.includes('trainee');
+        }
+        return false;
+      });
+    }
+
+    if (filters.salaryRange) {
+      filtered = filtered.filter(job => {
+        const salary = parseInt(job.salary?.replace(/[^0-9]/g, '') || '0');
+        const [min, max] = filters.salaryRange.split('-').map(Number);
+        
+        if (filters.salaryRange === '100000+') {
+          return salary >= 100000;
+        }
+        return salary >= min && salary <= max;
+      });
+    }
+
+    setFilterData(filtered);
   };
+
+  const handleApplyFilters = () => {
+    let filtered = [...jobs];
+
+    // Apply search filter if exists
+    if (searchQuery && searchQuery.trim() !== '') {
+      const searchText = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(job => {
+        const searchableFields = [
+          job.title,
+          job.company,
+          job.location,
+          job.experience,
+          job.jobType,
+          job.qualification,
+          job.job_category,
+          job.job_role
+        ].filter(Boolean);
+
+        return searchableFields.some(field => 
+          field.toLowerCase().includes(searchText)
+        );
+      });
+    }
+
+    // Apply filters with improved matching logic
+    if (filters.experience) {
+      filtered = filtered.filter(job => {
+        const jobExperience = job.experience?.toLowerCase() || '';
+        const filterExperience = filters.experience.toLowerCase();
+        
+        if (filterExperience === 'entry level') {
+          return jobExperience.includes('entry') || 
+                 jobExperience.includes('fresher') || 
+                 jobExperience.includes('0-1') ||
+                 jobExperience.includes('0 to 1');
+        } else if (filterExperience === 'mid level') {
+          return jobExperience.includes('mid') || 
+                 jobExperience.includes('2-5') ||
+                 jobExperience.includes('2 to 5');
+        } else if (filterExperience === 'senior level') {
+          return jobExperience.includes('senior') || 
+                 jobExperience.includes('5+') ||
+                 jobExperience.includes('5+ years');
+        }
+        return false;
+      });
+    }
+
+    if (filters.jobType) {
+      filtered = filtered.filter(job => {
+        const jobType = job.jobType?.toLowerCase() || '';
+        const filterType = filters.jobType.toLowerCase();
+        
+        if (filterType === 'full time') {
+          return jobType.includes('full') || jobType.includes('permanent');
+        } else if (filterType === 'part time') {
+          return jobType.includes('part');
+        } else if (filterType === 'contract') {
+          return jobType.includes('contract') || jobType.includes('temporary');
+        } else if (filterType === 'internship') {
+          return jobType.includes('intern') || jobType.includes('trainee');
+        }
+        return false;
+      });
+    }
+
+    if (filters.salaryRange) {
+      filtered = filtered.filter(job => {
+        const salary = parseInt(job.salary?.replace(/[^0-9]/g, '') || '0');
+        const [min, max] = filters.salaryRange.split('-').map(Number);
+        
+        if (filters.salaryRange === '100000+') {
+          return salary >= 100000;
+        }
+        return salary >= min && salary <= max;
+      });
+    }
+
+    setFilterData(filtered);
+    setShowFilterModal(false);
+  };
+
+  const handleFilterToggle = (type, value) => {
+    setFilters(prev => {
+      // If the same filter is clicked again, remove it
+      if (prev[type] === value) {
+        return { ...prev, [type]: '' };
+      }
+      // Otherwise, apply the new filter
+      return { ...prev, [type]: value };
+    });
+  };
+
+  const FilterModal = () => (
+    <Modal
+      visible={showFilterModal}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={() => setShowFilterModal(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Filter Jobs</Text>
+            <TouchableOpacity onPress={() => setShowFilterModal(false)}>
+              <Ionicons name="close" size={24} color="#2D3436" />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView style={styles.filterScroll}>
+            <View style={styles.filterSection}>
+              <Text style={styles.filterSectionTitle}>Experience Level</Text>
+              <View style={styles.filterOptions}>
+                {['Entry Level', 'Mid Level', 'Senior Level'].map((level) => (
+                  <TouchableOpacity
+                    key={level}
+                    style={[
+                      styles.filterOption,
+                      filters.experience === level && styles.filterOptionSelected,
+                    ]}
+                    onPress={() => handleFilterToggle('experience', level)}
+                  >
+                    <Text style={[
+                      styles.filterOptionText,
+                      filters.experience === level && styles.filterOptionTextSelected,
+                    ]}>
+                      {level}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.filterSection}>
+              <Text style={styles.filterSectionTitle}>Job Type</Text>
+              <View style={styles.filterOptions}>
+                {['Full Time', 'Part Time', 'Contract', 'Internship'].map((type) => (
+                  <TouchableOpacity
+                    key={type}
+                    style={[
+                      styles.filterOption,
+                      filters.jobType === type && styles.filterOptionSelected,
+                    ]}
+                    onPress={() => handleFilterToggle('jobType', type)}
+                  >
+                    <Text style={[
+                      styles.filterOptionText,
+                      filters.jobType === type && styles.filterOptionTextSelected,
+                    ]}>
+                      {type}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.filterSection}>
+              <Text style={styles.filterSectionTitle}>Salary Range</Text>
+              <View style={styles.filterOptions}>
+                {[
+                  { label: 'Below ₹20,000', value: '0-20000' },
+                  { label: '₹20,000 - ₹50,000', value: '20000-50000' },
+                  { label: '₹50,000 - ₹100,000', value: '50000-100000' },
+                  { label: 'Above ₹100,000', value: '100000+' },
+                ].map((range) => (
+                  <TouchableOpacity
+                    key={range.value}
+                    style={[
+                      styles.filterOption,
+                      filters.salaryRange === range.value && styles.filterOptionSelected,
+                    ]}
+                    onPress={() => handleFilterToggle('salaryRange', range.value)}
+                  >
+                    <Text style={[
+                      styles.filterOptionText,
+                      filters.salaryRange === range.value && styles.filterOptionTextSelected,
+                    ]}>
+                      {range.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          </ScrollView>
+
+          <View style={styles.modalFooter}>
+            <TouchableOpacity 
+              style={[styles.modalButton, styles.applyButton]}
+              onPress={handleApplyFilters}
+            >
+              <Text style={styles.applyButtonText}>Apply Filters</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
 
   return (
     <View style={styles.container}>
@@ -205,6 +466,12 @@ const JobsScreen = ({ navigation }) => {
               <Ionicons name="close-circle" size={20} color="#666" />
             </TouchableOpacity>
           )}
+          <TouchableOpacity 
+            style={styles.filterButton}
+            onPress={() => setShowFilterModal(true)}
+          >
+            <Ionicons name="filter" size={20} color="#0984E3" />
+          </TouchableOpacity>
         </View>
         {searchQuery.length > 0 && (
           <View style={styles.searchResults}>
@@ -245,6 +512,8 @@ const JobsScreen = ({ navigation }) => {
           jobs.length === 0 && styles.emptyList
         ]}
       />
+
+      <FilterModal />
     </View>
   );
 };
@@ -357,6 +626,92 @@ const styles = StyleSheet.create({
   },
   retryText: {
     color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  filterButton: {
+    padding: 8,
+    marginLeft: 8,
+    backgroundColor: '#E3F2FD',
+    borderRadius: 20,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    maxHeight: '80%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#2D3436',
+  },
+  filterScroll: {
+    maxHeight: 400,
+  },
+  filterSection: {
+    marginBottom: 24,
+  },
+  filterSectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2D3436',
+    marginBottom: 12,
+  },
+  filterOptions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  filterOption: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#F8F9FA',
+    borderWidth: 1,
+    borderColor: '#E9ECEF',
+  },
+  filterOptionSelected: {
+    backgroundColor: '#E3F2FD',
+    borderColor: '#0984E3',
+  },
+  filterOptionText: {
+    fontSize: 14,
+    color: '#2D3436',
+  },
+  filterOptionTextSelected: {
+    color: '#0984E3',
+    fontWeight: '500',
+  },
+  modalFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  applyButton: {
+    backgroundColor: '#0984E3',
+  },
+  applyButtonText: {
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },
