@@ -22,8 +22,8 @@ const JobsScreen = ({ navigation }) => {
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState(null);
   const [bookmarkedJobs, setBookmarkedJobs] = useState({});
-  const [searchQuery,setSearchQuery] = useState('');
-  const [filterData,SetFilterData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterData, setFilterData] = useState([]);
 
   const loadJobs = async (pageNum = 1, shouldRefresh = false) => {
     if (loading || (!hasMore && !shouldRefresh)) return;
@@ -105,13 +105,12 @@ const JobsScreen = ({ navigation }) => {
     initializeData();
   }, []);
 
-  // Keep filterData synchronized with jobs when jobs change
   useEffect(() => {
     console.log('Jobs updated:', jobs);
     if (searchQuery.trim() === '') {
-      SetFilterData(jobs);
+      setFilterData(jobs);
     } else {
-      handleSearch(searchQuery); // Re-apply current search when jobs update
+      handleSearch(searchQuery);
     }
   }, [jobs]);
 
@@ -159,42 +158,66 @@ const JobsScreen = ({ navigation }) => {
     setSearchQuery(query);
     
     if (!query || query.trim() === '') {
-      // When search is empty, show all jobs
-      SetFilterData(jobs);
+      setFilterData(jobs);
     } else {
-      // Filter jobs that contain the search query in their title
       const searchText = query.toLowerCase().trim();
       
-      // Filter jobs where title contains the search text
       const filtered = jobs.filter(job => {
-        if (!job.title) return false;
-        return job.title.toLowerCase().includes(searchText);
+        const searchableFields = [
+          job.title,
+          job.company,
+          job.location,
+          job.experience,
+          job.jobType,
+          job.qualification,
+          job.job_category,
+          job.job_role
+        ].filter(Boolean);
+
+        return searchableFields.some(field => 
+          field.toLowerCase().includes(searchText)
+        );
       });
       
-      SetFilterData(filtered);
+      setFilterData(filtered);
     }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search jobs by title..."
-          placeholderTextColor="#666"
-          value={searchQuery}
-          onChangeText={handleSearch}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
+        <View style={styles.searchInputContainer}>
+          <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search by title, company, location..."
+            placeholderTextColor="#666"
+            value={searchQuery}
+            onChangeText={handleSearch}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity 
+              onPress={() => handleSearch('')}
+              style={styles.clearButton}
+            >
+              <Ionicons name="close-circle" size={20} color="#666" />
+            </TouchableOpacity>
+          )}
+        </View>
         {searchQuery.length > 0 && (
           <View style={styles.searchResults}>
             <Text style={styles.searchResultsText}>
               {filterData.length} results found
             </Text>
+            <Text style={styles.searchHint}>
+              Try searching by title, company name, location, or job type
+            </Text>
           </View>
         )}
       </View>
+
       <FlatList
         data={filterData}
         renderItem={({ item }) => (
@@ -245,15 +268,36 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 3,
   },
-  searchInput: {
-    height: 50,
-    backgroundColor: '#F5F5F5',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 12,
+  searchInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F8F9FA',
+    borderRadius: 25,
     paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: '#E9ECEF',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    height: 50,
     fontSize: 16,
-    color: '#333',
+    color: '#2D3436',
+    paddingVertical: 8,
+  },
+  clearButton: {
+    padding: 4,
+    marginLeft: 4,
   },
   searchResults: {
     marginTop: 8,
@@ -262,6 +306,11 @@ const styles = StyleSheet.create({
   searchResultsText: {
     fontSize: 14,
     color: '#666',
+    marginBottom: 4,
+  },
+  searchHint: {
+    fontSize: 12,
+    color: '#999',
     fontStyle: 'italic',
   },
   listContainer: {

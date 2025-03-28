@@ -12,24 +12,28 @@ import JobDetailScreen from '../screens/JobDetailScreen';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-const LogoTitle = () => (
-  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-    <Text style={{ 
-      fontSize: 20, 
-      fontWeight: 'bold',
-      color: '#0984E3'
-    }}>
-      Lokal
-    </Text>
-    <Text style={{ 
-      fontSize: 20, 
-      fontWeight: 'bold',
-      color: '#2D3436'
-    }}>
-      App
-    </Text>
-  </View>
-);
+const LogoTitle = () => {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <Text style={{ 
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#0984E3',
+        letterSpacing: 0.5,
+      }}>
+        Lokal
+      </Text>
+      <Text style={{ 
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#2D3436',
+        letterSpacing: 0.5,
+      }}>
+        App
+      </Text>
+    </View>
+  );
+};
 
 const JobsStack = () => (
   <Stack.Navigator
