@@ -72,6 +72,30 @@ const JobDetailScreen = ({ route }) => {
     );
   };
 
+  const renderJobTypeTag = (type) => {
+    const getJobTypeColor = (type) => {
+      switch (type?.toLowerCase()) {
+        case 'full time':
+          return '#4CAF50';
+        case 'part time':
+          return '#FF9800';
+        case 'contract':
+          return '#F44336';
+        default:
+          return '#2196F3';
+      }
+    };
+
+    return (
+      <View style={[styles.tag, { backgroundColor: getJobTypeColor(type) + '20' }]}>
+        <Ionicons name="time" size={14} color={getJobTypeColor(type)} />
+        <Text style={[styles.tagText, { color: getJobTypeColor(type) }]}>
+          {type}
+        </Text>
+      </View>
+    );
+  };
+
   return (
     <ScrollView style={styles.container}>
       {job.image && (
@@ -92,7 +116,7 @@ const JobDetailScreen = ({ route }) => {
             <Ionicons
               name={isBookmarked ? 'bookmark' : 'bookmark-outline'}
               size={24}
-              color="#007AFF"
+              color="#0288D1"
             />
           </TouchableOpacity>
         </View>
@@ -108,6 +132,7 @@ const JobDetailScreen = ({ route }) => {
               </Text>
             </View>
           ))}
+          {renderJobTypeTag(job.jobType)}
         </View>
 
         <View style={styles.section}>
@@ -119,6 +144,9 @@ const JobDetailScreen = ({ route }) => {
           {renderDetailItem('briefcase-outline', 'Experience', job.experience)}
           {renderDetailItem('people-outline', 'Vacancies', job.vacancies > 0 ? `${job.vacancies} Openings` : null)}
           {renderDetailItem('calendar-outline', 'Posted On', new Date(job.createdOn).toLocaleDateString())}
+          {job.job_category && renderDetailItem('folder-outline', 'Category', job.job_category)}
+          {job.job_role && renderDetailItem('person-outline', 'Role', job.job_role)}
+          {job.shift_timing && renderDetailItem('time-outline', 'Shift Timing', job.shift_timing)}
         </View>
 
         {job.description && (
@@ -132,6 +160,21 @@ const JobDetailScreen = ({ route }) => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Requirements</Text>
             <Text style={styles.description}>{job.requirements}</Text>
+          </View>
+        )}
+
+        {job.contact_preference && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Contact Preferences</Text>
+            <View style={styles.preferenceItem}>
+              <Ionicons name="time-outline" size={20} color="#666" />
+              <View style={styles.preferenceTextContainer}>
+                <Text style={styles.preferenceLabel}>Preferred Contact Hours</Text>
+                <Text style={styles.preferenceText}>
+                  {job.contact_preference.preferred_call_start_time} - {job.contact_preference.preferred_call_end_time}
+                </Text>
+              </View>
+            </View>
           </View>
         )}
       </View>
@@ -160,76 +203,109 @@ const JobDetailScreen = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F8F9FA',
   },
   coverImage: {
     width: '100%',
-    height: 250,
+    height: 280,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
   content: {
     padding: 16,
+    marginTop: -30,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 20,
+    marginBottom: 16,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   titleContainer: {
     flex: 1,
     marginRight: 16,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
-    color: '#1a1a1a',
+    color: '#01579B',
     marginBottom: 8,
+    lineHeight: 32,
   },
   company: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: 17,
+    color: '#0288D1',
     marginBottom: 8,
+    fontWeight: '600',
   },
   bookmarkButton: {
-    padding: 4,
+    padding: 8,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
   },
   tagContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: 10,
     marginTop: 12,
-    marginBottom: 16,
-  },
-  tag: {
-    backgroundColor: '#f0f0f0',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  tagText: {
-    fontSize: 12,
-    color: '#666',
-  },
-  section: {
+    marginBottom: 20,
     backgroundColor: 'white',
-    borderRadius: 12,
     padding: 16,
-    marginBottom: 16,
+    borderRadius: 20,
+    elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+  },
+  tag: {
+    backgroundColor: '#F8F9FA',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 25,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderWidth: 1,
+    borderColor: '#E9ECEF',
+  },
+  tagText: {
+    fontSize: 13,
+    color: '#2D3436',
+    fontWeight: '500',
+  },
+  section: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 12,
-    color: '#1a1a1a',
+    marginBottom: 16,
+    color: '#01579B',
   },
   detailItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 16,
+    marginBottom: 20,
+    backgroundColor: '#F8F9FA',
+    padding: 12,
+    borderRadius: 12,
   },
   detailTextContainer: {
     marginLeft: 12,
@@ -239,15 +315,40 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginBottom: 4,
+    fontWeight: '500',
   },
   detailText: {
     fontSize: 16,
-    color: '#1a1a1a',
+    color: '#01579B',
+    fontWeight: '600',
   },
   description: {
     fontSize: 16,
-    color: '#333',
-    lineHeight: 24,
+    color: '#2D3436',
+    lineHeight: 26,
+  },
+  preferenceItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+    backgroundColor: '#F8F9FA',
+    padding: 12,
+    borderRadius: 12,
+  },
+  preferenceTextContainer: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  preferenceLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 4,
+    fontWeight: '500',
+  },
+  preferenceText: {
+    fontSize: 16,
+    color: '#01579B',
+    fontWeight: '600',
   },
   contactSection: {
     flexDirection: 'row',
@@ -255,7 +356,12 @@ const styles = StyleSheet.create({
     gap: 12,
     backgroundColor: 'white',
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderTopColor: '#E9ECEF',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   contactButton: {
     flex: 1,
@@ -263,11 +369,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 15,
     gap: 8,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   callButton: {
-    backgroundColor: '#0984E3',
+    backgroundColor: '#0288D1',
   },
   whatsappButton: {
     backgroundColor: '#25D366',
