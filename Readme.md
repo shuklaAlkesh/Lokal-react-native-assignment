@@ -1,5 +1,14 @@
 # LokalApp - Job Search Application
 
+## 📱 Live Demo
+
+Watch a complete walkthrough of the application:
+[View Demo Video](https://drive.google.com/file/d/1DaHv9aRmKL7gNFbj525UMpS1vk7mbew1/view?usp=sharing)
+
+## 🌟 Project Overview
+
+LokalApp is a modern job search platform built with React Native that connects job seekers with local employment opportunities. The application features an intuitive user interface, powerful search and filtering capabilities, and bookmarking functionality to help users find and save relevant job listings.
+
 <p align="center">
   <img src="Images/1.jpeg" width="300">
   <img src="Images/2.jpeg" width="300">
@@ -18,16 +27,6 @@
 <p align="center">
     <img src="Images/6.jpeg" width="300">
 </p>
-
-
-## 📱 Live Demo
-
-Watch a complete walkthrough of the application:
-[View Demo Video](https://drive.google.com/file/d/1DaHv9aRmKL7gNFbj525UMpS1vk7mbew1/view?usp=sharing)
-
-## 🌟 Project Overview
-
-LokalApp is a modern job search platform built with React Native that connects job seekers with local employment opportunities. The application features an intuitive user interface, powerful search and filtering capabilities, and bookmarking functionality to help users find and save relevant job listings.
 
 ## ✨ Key Features
 
