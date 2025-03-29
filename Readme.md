@@ -3,18 +3,20 @@
 <p align="center">
   <img src="Images/1.jpeg" width="300">
   <img src="Images/2.jpeg" width="300">
+</p>
+
+<p align="center">
   <img src="Images/3.jpeg" width="300">
-</p>
-
-<p align="center">
   <img src="Images/4.jpeg" width="300">
-  <img src="Images/5.jpeg" width="300">
-  <img src="Images/7.jpeg" width="300">
-  
 </p>
 
 <p align="center">
-  <img src="Images/6.jpeg" width="300">
+    <img src="Images/5.jpeg" width="300">
+    <img src="Images/7.jpeg" width="300">
+</p>
+
+<p align="center">
+    <img src="Images/6.jpeg" width="300">
 </p>
 
 
