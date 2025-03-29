@@ -1,66 +1,129 @@
-# Lokal App React Native Assignment
-
-## Overview
-Lokal Job Search is a comprehensive mobile application built with React Native that connects job seekers with local employment opportunities. This app was developed as part of the Lokal App assignment, showcasing a modern approach to local job hunting.
-
-## Mobile Preview
-Here are some snapshots of the Local App:
+# LokalApp - Job Search Application
 
 <p align="center">
-  <img src="Images/1.jpeg" width="300" hight="300">
-  <img src="Images/2.jpeg" width="300" hight="300">
+  <img src="Images/1.jpeg" width="300">
+  <img src="Images/2.jpeg" width="300">
 </p>
 
 <p align="center">
-   <img src="Images/4.jpeg" width="300" hight="300">
-  <img src="Images/3.jpeg" width="300" hight="300">
+  <img src="Images/4.jpeg" width="300">
+  <img src="Images/3.jpeg" width="300">
 </p>
 
+## 📱 Live Demo
 
-## Demo Video
-Watch the app demonstration here:
-[Demo Video Link](https://drive.google.com/file/d/1DaHv9aRmKL7gNFbj525UMpS1vk7mbew1/view?usp=sharing)
+Watch a complete walkthrough of the application:
+[View Demo Video](https://drive.google.com/file/d/1DaHv9aRmKL7gNFbj525UMpS1vk7mbew1/view?usp=sharing)
 
-## Repository
-Access the complete source code here:
-[GitHub Repository](https://github.com/shuklaAlkesh/Lokal-react-native-assignment.git)
+## 🌟 Project Overview
 
-## Features
-- Clean and intuitive user interface
-- Smooth navigation between screens
-- Data fetching and display
-- State management implementation
-- Responsive design for various screen sizes
+LokalApp is a modern job search platform built with React Native that connects job seekers with local employment opportunities. The application features an intuitive user interface, powerful search and filtering capabilities, and bookmarking functionality to help users find and save relevant job listings.
 
-## Technologies Used
-- React Native
-- JavaScript/TypeScript
-- React Navigation
-- Expo
-- Axios for API calls
-- AsyncStorage for local storage
-- React Native Paper (UI components)
+## ✨ Key Features
 
-## Installation Guide
+### Job Discovery
+- **Advanced Search** - Search jobs by title, company name, location, job type, and more
+- **Smart Filtering** - Filter jobs by experience level, job type, and salary range
+- **Real-time Results** - Instantly see matching job counts as you select filters
+
+### User Experience
+- **Intuitive Interface** - Clean, modern UI with smooth navigation
+- **Responsive Design** - Optimized for both mobile devices and web browsers
+- **Job Bookmarking** - Save interesting jobs for later viewing
+
+### Technical Features
+- **Efficient Data Loading** - Pagination support for handling large job lists
+- **State Management** - Robust state handling across the application
+- **Error Handling** - Graceful error management with user-friendly feedback
+
+## 🔍 Core Functionality
+
+### Jobs Screen
+The main screen where users can:
+- Browse available job listings
+- Search for specific jobs using multiple criteria
+- Apply filters to narrow down search results
+- Bookmark interesting jobs
+- Pull to refresh for the latest listings
+
+### Job Details Screen
+When selecting a job, users can:
+- View comprehensive job information
+- See company details, requirements, and responsibilities
+- Bookmark/unbookmark jobs directly from the details view
+
+### Bookmarks Screen
+Users can:
+- Access all saved job listings in one place
+- Remove bookmarks as needed
+- View full job details of saved listings
+
+## 🛠️ Technologies Used
+
+- **React Native** - Cross-platform mobile framework
+- **Expo** - Development toolchain for React Native
+- **React Navigation** - Navigation library for screen management
+- **AsyncStorage** - Local data persistence
+- **Axios** - API client for data fetching
+- **Ionicons** - Icon library for UI elements
+
+## 📋 Project Structure
+
+```
+lokal-app/
+├── src/
+│   ├── components/        # Reusable UI components
+│   ├── screens/           # Main application screens
+│   ├── navigation/        # Navigation configuration
+│   ├── services/          # API services
+│   └── database/          # Local storage utilities
+├── assets/                # Images and static assets
+└── app.json               # Application configuration
+```
+
+## 🚀 Installation Guide
 
 1. **Clone the Repository**
    ```bash
    git clone https://github.com/shuklaAlkesh/Lokal-react-native-assignment.git
-   ```
-
-2. **Navigate to Project Directory**
-   ```bash
    cd Lokal-react-native-assignment
    ```
 
-3. **Install Dependencies**
+2. **Install Dependencies**
    ```bash
    npm install
    # or
    yarn install
    ```
 
-4. **Start the Development Server**
+3. **Start the Development Server**
    ```bash
    npx expo start
    ```
+
+4. **Run on Device or Emulator**
+   - Press `a` to run on Android emulator
+   - Press `i` to run on iOS simulator
+   - Scan QR code with Expo Go app on your device
+
+## 💡 Implementation Highlights
+
+### Search Functionality
+The application implements a powerful search system that allows users to find jobs based on multiple criteria including:
+- Job title
+- Company name
+- Location
+- Experience level
+- Job type
+- Qualifications
+
+### Filter System
+The filter modal provides an intuitive way to refine job searches:
+- Experience level filters (Entry, Mid, Senior)
+- Job type filters (Full-time, Part-time, Contract, Internship)
+- Salary range filters
+
+### Performance Optimization
+- Memoized components to prevent unnecessary re-renders
+- Efficient state management using React hooks
+- Asynchronous operations to maintain UI responsiveness
